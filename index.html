@@ -5,8 +5,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="author" content="Rafael Diogo Da Silva">
-  <link rel="author" href="mailto:rafael.dsilva@claro.com.br">  
-  <meta name="description" content="Apostila interativa de Fundamentos de SQL, com módulo especial sobre tipos de dados, precisão e armazenamento.">
+  <link rel="author" href="mailto:rafael.dsilva@claro.com.br">    
+  <meta name="description"
+    content="Apostila interativa de Fundamentos de SQL, com módulo especial sobre tipos de dados, precisão e armazenamento.">
   <title>SQL Fundamentos | Apostila Interativa</title>
   <style>
     :root {
@@ -122,7 +123,7 @@
     }
 
     .top-search input {
-      width: 100%;
+      width: 100%;     
       padding: 10px 13px;
       border: 1px solid rgba(255, 255, 255, .3);
       background: rgba(255, 255, 255, .12);
@@ -897,20 +898,21 @@
   <div class="app">
     <header class="top">
       <div class="top-inner">
-        <div class="logo" aria-label="Claro">SQL</div>
+        <div class="logo" aria-label="SQL">SQL</div>
         <div class="heading">
           <h1>Fundamentos</h1><small>Apostila interativa para analistas</small>
         </div>
         <div class="top-search">
           <label class="sr-only" for="search">Buscar</label>
-          <!-- REMOVIDO caixa de busca-->
-          </div>
+          <input id="search" placeholder="Buscar: DECIMAL, JOIN, HAVING...">
+        </div>
         <div class="actions">
           <button class="iconbtn" id="themeBtn" title="Alternar tema">◐ 
-            <span
-              class="text">Tema</span>
-            </button>
-          
+            <span class="text">Tema</span>
+          </button>
+          <button class="iconbtn" id="printBtn" title="Imprimir ou salvar em PDF">▣ 
+            <span class="text">PDF</span>
+          </button>
         </div>
       </div>
     </header>
@@ -927,7 +929,7 @@
       <main class="main">
         <select class="mobile-nav" id="mobileNav" aria-label="Ir para módulo"></select>
         <section class="hero"><span class="eyebrow">Trilha revisada • MySQL como referência</span>
-          <h2>Fundamentos sólidos que sustentam decisões SQL confiáveis</h2>
+          <h2>Recupere os fundamentos que sustentam decisões SQL confiáveis</h2>
           <p>Uma jornada do tipo de dado ao plano de execução, com ênfase em precisão, modelagem, leitura de consultas e
             escolhas que evitam erros silenciosos.</p>
           <div class="hero-grid">
@@ -939,7 +941,8 @@
         </section>
         <div class="toolbar no-print"><button class="btn" id="startBtn">Começar pelo Módulo 0</button><button
             class="btn secondary" id="expandBtn">Expandir aulas</button><button class="btn secondary"
-            id="resetBtn">Reiniciar progresso</button></div>
+            id="saveBtn">Salvar HTML</button><button class="btn secondary" id="resetBtn">Reiniciar progresso</button>
+        </div>
 
         <section class="module" id="m0" data-title="0. Tipos de dados">
           <div class="module-head">
@@ -2035,27 +2038,461 @@ COMMIT;</code></pre>
     </div>
   </div>
   <script>
-    (() => {
-      'use strict';
-      const modules = [...document.querySelectorAll('.module[data-title]')]; const core = modules.filter(m => /^m\d+$/.test(m.id)); const key = 'sqlFundamentosProgressV1'; let done = new Set(JSON.parse(localStorage.getItem(key) || '[]'));
-      const nav = document.getElementById('nav'), mobile = document.getElementById('mobileNav'); modules.forEach(m => { const a = document.createElement('a'); a.href = '#' + m.id; a.textContent = m.dataset.title; a.dataset.id = m.id; nav.appendChild(a); const o = document.createElement('option'); o.value = m.id; o.textContent = m.dataset.title; mobile.appendChild(o) });
-      function refresh() { core.forEach(m => { const b = m.querySelector('.completeBtn'); const yes = done.has(m.id); if (b) { b.textContent = yes ? '✓ Módulo concluído' : 'Marcar módulo como concluído'; b.classList.toggle('done', yes) } const a = nav.querySelector(`[data-id="${m.id}"]`); if (a) a.classList.toggle('done', yes) }); const pct = Math.round(done.size / core.length * 100); document.getElementById('progressBar').style.width = pct + '%'; document.getElementById('progressLabel').textContent = pct + '%'; localStorage.setItem(key, JSON.stringify([...done])) }
-      document.querySelectorAll('.completeBtn').forEach(b => b.addEventListener('click', () => { const id = b.closest('.module').id; done.has(id) ? done.delete(id) : done.add(id); refresh() })); refresh();
-      mobile.addEventListener('change', () => document.getElementById(mobile.value).scrollIntoView({ behavior: 'smooth' })); document.getElementById('startBtn').onclick = () => document.getElementById('m0').scrollIntoView({ behavior: 'smooth' });
-      let expanded = false; document.getElementById('expandBtn').onclick = e => { expanded = !expanded; document.querySelectorAll('.lesson').forEach(d => d.open = expanded); e.currentTarget.textContent = expanded ? 'Recolher aulas' : 'Expandir aulas' };
-      document.getElementById('themeBtn').onclick = () => { const n = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = n; localStorage.setItem('sqlTheme', n) }; document.documentElement.dataset.theme = localStorage.getItem('sqlTheme') || 'light';
-      document.getElementById('printBtn').onclick = () => { document.querySelectorAll('.lesson').forEach(d => d.open = true); window.print() }; document.getElementById('resetBtn').onclick = () => { if (confirm('Reiniciar todo o progresso e os quizzes?')) { done.clear(); localStorage.removeItem(key); document.querySelectorAll('input[type=radio]').forEach(i => i.checked = false); document.querySelectorAll('.feedback').forEach(f => { f.className = 'feedback'; f.textContent = '' }); refresh() } };
-      document.getElementById('saveBtn').onclick = () => { const blob = new Blob(['<!doctype html>\n' + document.documentElement.outerHTML], { type: 'text/html;charset=utf-8' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'apostila_sql_fundamentos_interativa.html'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1500) };
-      document.querySelectorAll('.copy').forEach(b => b.onclick = async () => { const t = b.closest('.codebox').querySelector('code').innerText; try { await navigator.clipboard.writeText(t); b.textContent = 'Copiado ✓' } catch { const x = document.createElement('textarea'); x.value = t; document.body.appendChild(x); x.select(); document.execCommand('copy'); x.remove(); b.textContent = 'Copiado ✓' } setTimeout(() => b.textContent = 'Copiar', 1400) });
-      document.querySelectorAll('.quizCheck').forEach(b => b.onclick = () => { b.closest('.quiz').querySelectorAll('.q').forEach(q => { const s = q.querySelector('input:checked'), f = q.querySelector('.feedback'); f.classList.add('show'); if (s && s.value === q.dataset.answer) { f.className = 'feedback show good'; f.textContent = 'Correto. A escolha preserva a semântica e evita erros silenciosos.' } else { f.className = 'feedback show bad'; f.textContent = 'Revise a explicação acima e tente novamente.' } }) });
-      const ranges = { TINYINT: { signed: ['-128', '127'], unsigned: ['0', '255'] }, SMALLINT: { signed: ['-32.768', '32.767'], unsigned: ['0', '65.535'] }, INT: { signed: ['-2.147.483.648', '2.147.483.647'], unsigned: ['0', '4.294.967.295'] }, BIGINT: { signed: ['-9.223.372.036.854.775.808', '9.223.372.036.854.775.807'], unsigned: ['0', '18.446.744.073.709.551.615'] } };
-      document.getElementById('intCalc').onclick = () => { const t = document.getElementById('intType').value, s = document.getElementById('unsigned').value, r = ranges[t][s]; document.getElementById('intResult').textContent = `${t}${s === 'unsigned' ? ' UNSIGNED' : ''}: de ${r[0]} até ${r[1]}.` };
-      document.getElementById('decCalc').onclick = () => { const p = +document.getElementById('precision').value, s = +document.getElementById('scale').value, r = document.getElementById('decResult'); if (!Number.isInteger(p) || !Number.isInteger(s) || p < 1 || s < 0 || s > p) { r.textContent = 'Use inteiros com p ≥ 1 e 0 ≤ s ≤ p.'; return } const i = p - s; const max = (i ? '9'.repeat(Math.min(i, 30)) : '0') + (s ? ',' + '9'.repeat(Math.min(s, 30)) : ''); r.textContent = `DECIMAL(${p},${s}): ${i} dígito(s) antes e ${s} depois do separador. Máximo positivo conceitual: ${max}${i > 30 || s > 30 ? ' (exibição abreviada)' : ''}.` };
-      const search = document.getElementById('search'); search.addEventListener('input', () => { const q = search.value.trim().toLocaleLowerCase('pt-BR'); modules.forEach(m => m.classList.remove('search-hit')); if (q.length < 2) return; const hits = modules.filter(m => m.innerText.toLocaleLowerCase('pt-BR').includes(q)); hits.forEach(m => m.classList.add('search-hit')); if (hits[0]) hits[0].scrollIntoView({ behavior: 'smooth', block: 'start' }) });
-      const io = new IntersectionObserver(es => { es.filter(e => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio).slice(0, 1).forEach(e => { nav.querySelectorAll('a').forEach(a => a.classList.toggle('active', a.dataset.id === e.target.id)); mobile.value = e.target.id }) }, { rootMargin: '-20% 0px -65% 0px', threshold: [0, .25, .5] }); modules.forEach(m => io.observe(m));
-    })();
+(() => {
+    'use strict';
+
+    const modules = [
+        ...document.querySelectorAll('.module[data-title]')
+    ];
+
+    const core = modules.filter(module => /^m\d+$/.test(module.id));
+    const key = 'sqlFundamentosProgressV1';
+
+    let done = new Set(
+        JSON.parse(localStorage.getItem(key) || '[]')
+    );
+
+    const nav = document.getElementById('nav');
+    const mobile = document.getElementById('mobileNav');
+
+    modules.forEach(module => {
+        const link = document.createElement('a');
+
+        link.href = `#${module.id}`;
+        link.textContent = module.dataset.title;
+        link.dataset.id = module.id;
+
+        nav.appendChild(link);
+
+        const option = document.createElement('option');
+
+        option.value = module.id;
+        option.textContent = module.dataset.title;
+
+        mobile.appendChild(option);
+    });
+
+    function refresh() {
+        core.forEach(module => {
+            const button = module.querySelector('.completeBtn');
+            const isCompleted = done.has(module.id);
+
+            if (button) {
+                button.textContent = isCompleted
+                    ? '✓ Módulo concluído'
+                    : 'Marcar módulo como concluído';
+
+                button.classList.toggle('done', isCompleted);
+            }
+
+            const navLink = nav.querySelector(
+                `[data-id="${module.id}"]`
+            );
+
+            if (navLink) {
+                navLink.classList.toggle('done', isCompleted);
+            }
+        });
+
+        const percentage = Math.round(
+            (done.size / core.length) * 100
+        );
+
+        document.getElementById('progressBar').style.width =
+            `${percentage}%`;
+
+        document.getElementById('progressLabel').textContent =
+            `${percentage}%`;
+
+        localStorage.setItem(
+            key,
+            JSON.stringify([...done])
+        );
+    }
+
+    document
+        .querySelectorAll('.completeBtn')
+        .forEach(button => {
+            button.addEventListener('click', () => {
+                const moduleId = button.closest('.module').id;
+
+                if (done.has(moduleId)) {
+                    done.delete(moduleId);
+                } else {
+                    done.add(moduleId);
+                }
+
+                refresh();
+            });
+        });
+
+    refresh();
+
+    mobile.addEventListener('change', () => {
+        document
+            .getElementById(mobile.value)
+            .scrollIntoView({
+                behavior: 'smooth'
+            });
+    });
+
+    document.getElementById('startBtn').onclick = () => {
+        document
+            .getElementById('m0')
+            .scrollIntoView({
+                behavior: 'smooth'
+            });
+    };
+
+    let expanded = false;
+
+    document.getElementById('expandBtn').onclick = event => {
+        expanded = !expanded;
+
+        document
+            .querySelectorAll('.lesson')
+            .forEach(lesson => {
+                lesson.open = expanded;
+            });
+
+        event.currentTarget.textContent = expanded
+            ? 'Recolher aulas'
+            : 'Expandir aulas';
+    };
+
+    document.getElementById('themeBtn').onclick = () => {
+        const newTheme =
+            document.documentElement.dataset.theme === 'dark'
+                ? 'light'
+                : 'dark';
+
+        document.documentElement.dataset.theme = newTheme;
+
+        localStorage.setItem('sqlTheme', newTheme);
+    };
+
+    document.documentElement.dataset.theme =
+        localStorage.getItem('sqlTheme') || 'light';
+
+    document.getElementById('printBtn').onclick = () => {
+        document
+            .querySelectorAll('.lesson')
+            .forEach(lesson => {
+                lesson.open = true;
+            });
+
+        window.print();
+    };
+
+    document.getElementById('resetBtn').onclick = () => {
+        const shouldReset = confirm(
+            'Reiniciar todo o progresso e os quizzes?'
+        );
+
+        if (!shouldReset) {
+            return;
+        }
+
+        done.clear();
+        localStorage.removeItem(key);
+
+        document
+            .querySelectorAll('input[type="radio"]')
+            .forEach(input => {
+                input.checked = false;
+            });
+
+        document
+            .querySelectorAll('.feedback')
+            .forEach(feedback => {
+                feedback.className = 'feedback';
+                feedback.textContent = '';
+            });
+
+        refresh();
+    };
+
+    document.getElementById('saveBtn').onclick = () => {
+        const htmlContent =
+            '<!doctype html>\n' +
+            document.documentElement.outerHTML;
+
+        const blob = new Blob(
+            [htmlContent],
+            {
+                type: 'text/html;charset=utf-8'
+            }
+        );
+
+        const link = document.createElement('a');
+
+        link.href = URL.createObjectURL(blob);
+        link.download =
+            'apostila_sql_fundamentos_interativa.html';
+
+        link.click();
+
+        setTimeout(() => {
+            URL.revokeObjectURL(link.href);
+        }, 1500);
+    };
+
+    document
+        .querySelectorAll('.copy')
+        .forEach(button => {
+            button.onclick = async () => {
+                const code = button
+                    .closest('.codebox')
+                    .querySelector('code')
+                    .innerText;
+
+                try {
+                    await navigator.clipboard.writeText(code);
+
+                    button.textContent = 'Copiado ✓';
+                } catch {
+                    const textarea =
+                        document.createElement('textarea');
+
+                    textarea.value = code;
+
+                    document.body.appendChild(textarea);
+
+                    textarea.select();
+                    document.execCommand('copy');
+                    textarea.remove();
+
+                    button.textContent = 'Copiado ✓';
+                }
+
+                setTimeout(() => {
+                    button.textContent = 'Copiar';
+                }, 1400);
+            };
+        });
+
+    document
+        .querySelectorAll('.quizCheck')
+        .forEach(button => {
+            button.onclick = () => {
+                const quiz = button.closest('.quiz');
+
+                quiz
+                    .querySelectorAll('.q')
+                    .forEach(question => {
+                        const selectedAnswer =
+                            question.querySelector(
+                                'input:checked'
+                            );
+
+                        const feedback =
+                            question.querySelector(
+                                '.feedback'
+                            );
+
+                        feedback.classList.add('show');
+
+                        const isCorrect =
+                            selectedAnswer &&
+                            selectedAnswer.value ===
+                                question.dataset.answer;
+
+                        if (isCorrect) {
+                            feedback.className =
+                                'feedback show good';
+
+                            feedback.textContent =
+                                'Correto. A escolha preserva a semântica e evita erros silenciosos.';
+                        } else {
+                            feedback.className =
+                                'feedback show bad';
+
+                            feedback.textContent =
+                                'Revise a explicação acima e tente novamente.';
+                        }
+                    });
+            };
+        });
+
+    const ranges = {
+        TINYINT: {
+            signed: ['-128', '127'],
+            unsigned: ['0', '255']
+        },
+
+        SMALLINT: {
+            signed: ['-32.768', '32.767'],
+            unsigned: ['0', '65.535']
+        },
+
+        INT: {
+            signed: [
+                '-2.147.483.648',
+                '2.147.483.647'
+            ],
+
+            unsigned: [
+                '0',
+                '4.294.967.295'
+            ]
+        },
+
+        BIGINT: {
+            signed: [
+                '-9.223.372.036.854.775.808',
+                '9.223.372.036.854.775.807'
+            ],
+
+            unsigned: [
+                '0',
+                '18.446.744.073.709.551.615'
+            ]
+        }
+    };
+
+    document.getElementById('intCalc').onclick = () => {
+        const type = document.getElementById('intType').value;
+
+        const signal = document.getElementById('unsigned').value;
+
+        const range = ranges[type][signal];
+
+        const unsignedLabel =
+            signal === 'unsigned'
+                ? ' UNSIGNED'
+                : '';
+
+        document.getElementById('intResult').textContent =
+            `${type}${unsignedLabel}: ` +
+            `de ${range[0]} até ${range[1]}.`;
+    };
+
+    document.getElementById('decCalc').onclick = () => {
+        const precision = Number(
+            document.getElementById('precision').value
+        );
+
+        const scale = Number(
+            document.getElementById('scale').value
+        );
+
+        const result =
+            document.getElementById('decResult');
+
+        const isInvalid =
+            !Number.isInteger(precision) ||
+            !Number.isInteger(scale) ||
+            precision < 1 ||
+            scale < 0 ||
+            scale > precision;
+
+        if (isInvalid) {
+            result.textContent =
+                'Use inteiros com p ≥ 1 e 0 ≤ s ≤ p.';
+
+            return;
+        }
+
+        const integerDigits = precision - scale;
+
+        const integerPart = integerDigits
+            ? '9'.repeat(Math.min(integerDigits, 30))
+            : '0';
+
+        const decimalPart = scale
+            ? `,${'9'.repeat(Math.min(scale, 30))}`
+            : '';
+
+        const maximumValue =
+            integerPart + decimalPart;
+
+        const abbreviated =
+            integerDigits > 30 || scale > 30
+                ? ' (exibição abreviada)'
+                : '';
+
+        result.textContent =
+            `DECIMAL(${precision},${scale}): ` +
+            `${integerDigits} dígito(s) antes e ` +
+            `${scale} depois do separador. ` +
+            `Máximo positivo conceitual: ` +
+            `${maximumValue}${abbreviated}.`;
+    };
+
+    const search =
+        document.getElementById('search');
+
+    search.addEventListener('input', () => {
+        const query = search.value
+            .trim()
+            .toLocaleLowerCase('pt-BR');
+
+        modules.forEach(module => {
+            module.classList.remove('search-hit');
+        });
+
+        if (query.length < 2) {
+            return;
+        }
+
+        const hits = modules.filter(module => {
+            const moduleContent =
+                module.innerText.toLocaleLowerCase('pt-BR');
+
+            return moduleContent.includes(query);
+        });
+
+        hits.forEach(module => {
+            module.classList.add('search-hit');
+        });
+
+        if (hits[0]) {
+            hits[0].scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+
+    const intersectionObserver =
+        new IntersectionObserver(
+            entries => {
+                entries
+                    .filter(entry => entry.isIntersecting)
+                    .sort(
+                        (first, second) =>
+                            second.intersectionRatio -
+                            first.intersectionRatio
+                    )
+                    .slice(0, 1)
+                    .forEach(entry => {
+                        nav
+                            .querySelectorAll('a')
+                            .forEach(link => {
+                                const isActive =
+                                    link.dataset.id ===
+                                    entry.target.id;
+
+                                link.classList.toggle(
+                                    'active',
+                                    isActive
+                                );
+                            });
+
+                        mobile.value = entry.target.id;
+                    });
+            },
+            {
+                rootMargin: '-20% 0px -65% 0px',
+                threshold: [0, 0.25, 0.5]
+            }
+        );
+
+    modules.forEach(module => {
+        intersectionObserver.observe(module);
+    });
+})();
   </script>
-  
 </body>
 
 </html>
