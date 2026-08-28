@@ -1,0 +1,2060 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="author" content="Rafael Diogo Da Silva">
+  <link rel="author" href="mailto:rafael.dsilva@claro.com.br">  
+  <meta name="description" content="Apostila interativa de Fundamentos de SQL, com módulo especial sobre tipos de dados, precisão e armazenamento.">
+  <title>SQL Fundamentos | Apostila Interativa</title>
+  <style>
+    :root {
+      --red: #DA291C;
+      --red2: #AF272F;
+      --orange: #F5842B;
+      --cyan: #0097A9;
+      --gray: #A7A8AA;
+      --ink: #2D291C;
+      --bg: #F5F6F7;
+      --card: #fff;
+      --line: #e3e5e7;
+      --muted: #64676b;
+      --ok: #16865c;
+      --shadow: 0 8px 24px rgba(45, 41, 28, .09);
+      --radius: 12px;
+      --code: #17191d;
+      --codeText: #eff2f5
+    }
+
+    [data-theme="dark"] {
+      --ink: #f2f4f5;
+      --bg: #111315;
+      --card: #1b1e21;
+      --line: #34383c;
+      --muted: #b8bdc1;
+      --shadow: 0 8px 24px rgba(0, 0, 0, .28);
+      --code: #090a0c;
+      --codeText: #f3f4f5
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+      line-height: 1.58
+    }
+
+    button,
+    input,
+    select {
+      font: inherit
+    }
+
+    button {
+      cursor: pointer
+    }
+
+    .app {
+      min-height: 100vh
+    }
+
+    .top {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: linear-gradient(100deg, #2D291C 0%, #3a3526 62%, #AF272F 100%);
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, .22)
+    }
+
+    .top-inner {
+      max-width: 1480px;
+      margin: auto;
+      padding: 13px 22px;
+      display: flex;
+      align-items: center;
+      gap: 16px
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      flex: 0 0 48px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at 38% 25%, #ff8178 0, #DA291C 42%, #AF272F 78%);
+      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .15), 0 3px 10px rgba(0, 0, 0, .25);
+      font-weight: 800;
+      font-size: 13px
+    }
+
+    .heading {
+      min-width: 220px
+    }
+
+    .heading h1 {
+      font-size: 19px;
+      margin: 0;
+      line-height: 1.2
+    }
+
+    .heading small {
+      opacity: .82
+    }
+
+    .top-search {
+      margin-left: auto;
+      min-width: 210px;
+      max-width: 410px;
+      flex: 1;
+      position: relative
+    }
+
+    .top-search input {
+      width: 100%;
+      padding: 10px 13px;
+      border: 1px solid rgba(255, 255, 255, .3);
+      background: rgba(255, 255, 255, .12);
+      color: white;
+      border-radius: 10px;
+      outline: none
+    }
+
+    .top-search input::placeholder {
+      color: #ddd
+    }
+
+    .actions {
+      display: flex;
+      gap: 7px
+    }
+
+    .iconbtn {
+      border: 1px solid rgba(255, 255, 255, .27);
+      background: rgba(255, 255, 255, .1);
+      color: #fff;
+      border-radius: 9px;
+      padding: 9px 11px
+    }
+
+    .iconbtn:hover {
+      background: rgba(255, 255, 255, .2)
+    }
+
+    .layout {
+      max-width: 1480px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: 290px minmax(0, 1fr);
+      gap: 24px;
+      padding: 24px
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 99px;
+      align-self: start;
+      max-height: calc(100vh - 120px);
+      overflow: auto;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px
+    }
+
+    .progress-wrap {
+      margin-bottom: 16px
+    }
+
+    .progress-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px
+    }
+
+    .progress {
+      height: 9px;
+      background: var(--line);
+      border-radius: 99px;
+      overflow: hidden
+    }
+
+    .progress>span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--red), var(--orange));
+      transition: .25s
+    }
+
+    .nav {
+      display: grid;
+      gap: 5px
+    }
+
+    .nav a {
+      color: var(--ink);
+      text-decoration: none;
+      padding: 9px 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      border-left: 3px solid transparent
+    }
+
+    .nav a:hover,
+    .nav a.active {
+      background: color-mix(in srgb, var(--red) 9%, transparent);
+      border-left-color: var(--red)
+    }
+
+    .nav a.done::after {
+      content: " ✓";
+      color: var(--ok);
+      font-weight: 800
+    }
+
+    .side-note {
+      margin-top: 14px;
+      padding: 11px;
+      border-radius: 9px;
+      background: color-mix(in srgb, var(--cyan) 10%, transparent);
+      font-size: 12px
+    }
+
+    .main {
+      min-width: 0
+    }
+
+    .hero {
+      background: linear-gradient(125deg, #fff 0%, #fff 64%, #fff4f2 100%);
+      color: #2D291C;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 34px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid #ece8e5
+    }
+
+    .hero:after {
+      content: "SQL";
+      position: absolute;
+      right: 14px;
+      bottom: -38px;
+      font-weight: 900;
+      font-size: 140px;
+      color: rgba(218, 41, 28, .06)
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: #fff0ee;
+      color: var(--red2);
+      border: 1px solid #ffd4cf;
+      border-radius: 99px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .04em
+    }
+
+    .hero h2 {
+      font-size: clamp(29px, 4vw, 52px);
+      line-height: 1.04;
+      margin: 16px 0 12px;
+      max-width: 850px
+    }
+
+    .hero p {
+      font-size: 18px;
+      max-width: 850px;
+      color: #544f43
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 24px
+    }
+
+    .metric {
+      background: rgba(255, 255, 255, .88);
+      padding: 13px;
+      border: 1px solid #eee6e2;
+      border-radius: 10px
+    }
+
+    .metric strong {
+      display: block;
+      color: var(--red);
+      font-size: 21px
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin: 18px 0
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 9px;
+      padding: 10px 14px;
+      font-weight: 750;
+      background: var(--red);
+      color: #fff
+    }
+
+    .btn.secondary {
+      background: var(--card);
+      color: var(--ink);
+      border: 1px solid var(--line)
+    }
+
+    .btn.cyan {
+      background: var(--cyan)
+    }
+
+    .module {
+      scroll-margin-top: 105px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      margin: 20px 0;
+      overflow: hidden
+    }
+
+    .module-head {
+      padding: 25px 27px 18px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      gap: 16px;
+      align-items: flex-start
+    }
+
+    .mod-num {
+      width: 48px;
+      height: 48px;
+      flex: 0 0 48px;
+      border-radius: 12px;
+      background: linear-gradient(140deg, var(--red), var(--red2));
+      color: white;
+      display: grid;
+      place-items: center;
+      font-weight: 900
+    }
+
+    .module-head h2 {
+      margin: 0;
+      font-size: 27px;
+      line-height: 1.2
+    }
+
+    .module-head p {
+      margin: 6px 0 0;
+      color: var(--muted)
+    }
+
+    .module-body {
+      padding: 25px 27px
+    }
+
+    .lesson {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      margin: 12px 0;
+      overflow: hidden
+    }
+
+    .lesson summary {
+      list-style: none;
+      padding: 16px 18px;
+      font-weight: 800;
+      cursor: pointer;
+      background: color-mix(in srgb, var(--gray) 7%, transparent);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px
+    }
+
+    .lesson summary::-webkit-details-marker {
+      display: none
+    }
+
+    .lesson summary:after {
+      content: "＋";
+      color: var(--red);
+      font-size: 18px
+    }
+
+    .lesson[open] summary:after {
+      content: "−"
+    }
+
+    .lesson-content {
+      padding: 18px
+    }
+
+    .grid2,
+    .grid3,
+    .grid4 {
+      display: grid;
+      gap: 15px
+    }
+
+    .grid2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr))
+    }
+
+    .grid3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr))
+    }
+
+    .grid4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr))
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      padding: 16px;
+      background: var(--card)
+    }
+
+    .card h4 {
+      margin: 0 0 8px;
+      color: var(--red2)
+    }
+
+    .callout {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border-left: 4px solid var(--cyan);
+      background: color-mix(in srgb, var(--cyan) 8%, transparent);
+      border-radius: 0 9px 9px 0
+    }
+
+    .callout.warn {
+      border-left-color: var(--orange);
+      background: color-mix(in srgb, var(--orange) 9%, transparent)
+    }
+
+    .callout.danger {
+      border-left-color: var(--red);
+      background: color-mix(in srgb, var(--red) 8%, transparent)
+    }
+
+    .callout.ok {
+      border-left-color: var(--ok);
+      background: color-mix(in srgb, var(--ok) 8%, transparent)
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 99px;
+      background: color-mix(in srgb, var(--cyan) 13%, transparent);
+      color: var(--cyan);
+      margin: 2px
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      margin: 14px 0
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 660px
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top
+    }
+
+    th {
+      background: color-mix(in srgb, var(--gray) 10%, transparent);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .04em
+    }
+
+    tr:last-child td {
+      border-bottom: 0
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      background: color-mix(in srgb, var(--gray) 14%, transparent);
+      padding: .12em .35em;
+      border-radius: 4px
+    }
+
+    .codebox {
+      background: var(--code);
+      color: var(--codeText);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 14px 0
+    }
+
+    .codebar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 12px;
+      background: #25282d;
+      font-size: 12px;
+      color: #c7ccd1
+    }
+
+    .copy {
+      border: 0;
+      border-radius: 6px;
+      padding: 5px 8px;
+      background: #3b3f45;
+      color: #fff
+    }
+
+    .codebox pre {
+      margin: 0;
+      padding: 16px;
+      overflow: auto;
+      line-height: 1.55
+    }
+
+    .codebox code {
+      background: none;
+      padding: 0;
+      color: inherit
+    }
+
+    .sql-key {
+      color: #ff7c72
+    }
+
+    .sql-fn {
+      color: #79c0ff
+    }
+
+    .sql-str {
+      color: #a5d6ff
+    }
+
+    .diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 20px;
+      flex-wrap: wrap
+    }
+
+    .bubble {
+      width: 108px;
+      height: 108px;
+      border-radius: 50%;
+      border: 3px solid var(--cyan);
+      background: color-mix(in srgb, var(--cyan) 14%, transparent);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      font-weight: 800
+    }
+
+    .arrow {
+      font-size: 28px;
+      color: var(--red)
+    }
+
+    .quiz {
+      border: 1px solid color-mix(in srgb, var(--orange) 40%, var(--line));
+      border-radius: 12px;
+      padding: 18px;
+      margin-top: 18px;
+      background: color-mix(in srgb, var(--orange) 4%, transparent)
+    }
+
+    .quiz h3 {
+      margin-top: 0
+    }
+
+    .q {
+      margin: 15px 0;
+      padding-top: 10px;
+      border-top: 1px dashed var(--line)
+    }
+
+    .q label {
+      display: block;
+      margin: 6px 0;
+      padding: 8px;
+      border-radius: 7px
+    }
+
+    .q label:hover {
+      background: color-mix(in srgb, var(--cyan) 6%, transparent)
+    }
+
+    .feedback {
+      display: none;
+      padding: 10px;
+      border-radius: 7px;
+      margin-top: 8px
+    }
+
+    .feedback.show {
+      display: block
+    }
+
+    .feedback.good {
+      background: color-mix(in srgb, var(--ok) 12%, transparent);
+      color: var(--ok)
+    }
+
+    .feedback.bad {
+      background: color-mix(in srgb, var(--red) 10%, transparent);
+      color: var(--red)
+    }
+
+    .calc {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      align-items: end
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 4px
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--ink)
+    }
+
+    .result {
+      padding: 14px;
+      border-radius: 9px;
+      background: color-mix(in srgb, var(--cyan) 8%, transparent);
+      margin-top: 10px;
+      font-weight: 700
+    }
+
+    .complete {
+      display: flex;
+      justify-content: flex-end;
+      padding-top: 18px
+    }
+
+    .complete button.done {
+      background: var(--ok)
+    }
+
+    .search-hit {
+      outline: 3px solid color-mix(in srgb, var(--orange) 45%, transparent)
+    }
+
+    .glossary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px
+    }
+
+    .term {
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 12px
+    }
+
+    .term b {
+      color: var(--red2)
+    }
+
+    footer {
+      padding: 30px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    .mobile-nav {
+      display: none
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0
+    }
+
+    @media(max-width:970px) {
+      .layout {
+        grid-template-columns: 1fr;
+        padding: 14px
+      }
+
+      .sidebar {
+        display: none
+      }
+
+      .top-inner {
+        flex-wrap: wrap
+      }
+
+      .top-search {
+        order: 3;
+        min-width: 100%
+      }
+
+      .actions {
+        margin-left: auto
+      }
+
+      .mobile-nav {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: var(--card);
+        color: var(--ink);
+        margin-bottom: 12px
+      }
+
+      .hero-grid,
+      .grid4 {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .grid3 {
+        grid-template-columns: 1fr 1fr
+      }
+    }
+
+    @media(max-width:620px) {
+      .heading small {
+        display: none
+      }
+
+      .logo {
+        width: 42px;
+        height: 42px;
+        flex-basis: 42px
+      }
+
+      .actions .text {
+        display: none
+      }
+
+      .hero {
+        padding: 24px 19px
+      }
+
+      .hero-grid,
+      .grid2,
+      .grid3,
+      .grid4,
+      .calc,
+      .glossary {
+        grid-template-columns: 1fr
+      }
+
+      .module-head,
+      .module-body {
+        padding: 20px 17px
+      }
+
+      .module-head h2 {
+        font-size: 22px
+      }
+
+      .mod-num {
+        width: 42px;
+        height: 42px;
+        flex-basis: 42px
+      }
+
+      .top-inner {
+        padding: 10px 12px
+      }
+    }
+
+    @media print {
+      @page {
+        size: A4 landscape;
+        margin: 10mm
+      }
+
+      .top {
+        position: relative
+      }
+
+      .top-search,
+      .actions,
+      .sidebar,
+      .toolbar,
+      .mobile-nav,
+      .complete,
+      .copy,
+      .quiz button {
+        display: none !important
+      }
+
+      .layout {
+        display: block;
+        padding: 0
+      }
+
+      .main {
+        width: 100%
+      }
+
+      .hero,
+      .module {
+        box-shadow: none;
+        break-inside: auto
+      }
+
+      .lesson {
+        break-inside: avoid
+      }
+
+      .module {
+        break-before: page
+      }
+
+      .module:first-of-type {
+        break-before: auto
+      }
+
+      body {
+        background: white;
+        color: #222;
+        font-size: 10pt
+      }
+
+      .lesson:not([open]) .lesson-content {
+        display: block
+      }
+
+      .table-wrap {
+        overflow: visible
+      }
+
+      table {
+        min-width: 0;
+        font-size: 8.5pt
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <header class="top">
+      <div class="top-inner">
+        <div class="logo" aria-label="Claro">SQL</div>
+        <div class="heading">
+          <h1>Fundamentos</h1><small>Apostila interativa para analistas</small>
+        </div>
+        <div class="top-search">
+          <label class="sr-only" for="search">Buscar</label>
+          <!-- REMOVIDO caixa de busca-->
+          </div>
+        <div class="actions">
+          <button class="iconbtn" id="themeBtn" title="Alternar tema">◐ 
+            <span
+              class="text">Tema</span>
+            </button>
+          
+        </div>
+      </div>
+    </header>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="progress-wrap">
+          <div class="progress-row"><span>Seu progresso</span><span id="progressLabel">0%</span></div>
+          <div class="progress"><span id="progressBar"></span></div>
+        </div>
+        <nav class="nav" id="nav"></nav>
+        <div class="side-note"><b>Dica:</b> avance na ordem, execute os exemplos e só então marque o módulo como
+          concluído. O progresso fica salvo neste navegador.</div>
+      </aside>
+      <main class="main">
+        <select class="mobile-nav" id="mobileNav" aria-label="Ir para módulo"></select>
+        <section class="hero"><span class="eyebrow">Trilha revisada • MySQL como referência</span>
+          <h2>Fundamentos sólidos que sustentam decisões SQL confiáveis</h2>
+          <p>Uma jornada do tipo de dado ao plano de execução, com ênfase em precisão, modelagem, leitura de consultas e
+            escolhas que evitam erros silenciosos.</p>
+          <div class="hero-grid">
+            <div class="metric"><strong>11</strong><span>módulos</span></div>
+            <div class="metric"><strong>45+</strong><span>exemplos SQL</span></div>
+            <div class="metric"><strong>100%</strong><span>arquivo local</span></div>
+            <div class="metric"><strong>5</strong><span>dialetos sinalizados</span></div>
+          </div>
+        </section>
+        <div class="toolbar no-print"><button class="btn" id="startBtn">Começar pelo Módulo 0</button><button
+            class="btn secondary" id="expandBtn">Expandir aulas</button><button class="btn secondary"
+            id="resetBtn">Reiniciar progresso</button></div>
+
+        <section class="module" id="m0" data-title="0. Tipos de dados">
+          <div class="module-head">
+            <div class="mod-num">0</div>
+            <div>
+              <h2>Tipos de dados, precisão e armazenamento</h2>
+              <p>Escolha o tipo pelo domínio, intervalo, precisão, semântica, portabilidade e custo.</p>
+            </div>
+          </div>
+          <div class="module-body">
+            <div class="callout ok"><b>Objetivo:</b> ao final, você deverá justificar por que uma coluna é
+              <code>BIGINT</code>, <code>DECIMAL</code>, <code>VARCHAR</code>, <code>DATE</code> ou outra opção, e
+              antecipar os riscos da escolha.</div>
+            <details class="lesson" open>
+              <summary>0.1 Um método de decisão em sete perguntas</summary>
+              <div class="lesson-content">
+                <div class="grid3">
+                  <div class="card">
+                    <h4>1. Domínio</h4>
+                    <p>É quantidade, código, texto, instante, duração, binário ou estrutura semiestruturada?</p>
+                  </div>
+                  <div class="card">
+                    <h4>2. Faixa</h4>
+                    <p>Há negativos? Qual é o máximo atual e o crescimento esperado?</p>
+                  </div>
+                  <div class="card">
+                    <h4>3. Exatidão</h4>
+                    <p>O valor exige igualdade decimal exata ou tolera aproximação binária?</p>
+                  </div>
+                  <div class="card">
+                    <h4>4. Tamanho</h4>
+                    <p>O comprimento é fixo ou variável? Limite em caracteres ou bytes?</p>
+                  </div>
+                  <div class="card">
+                    <h4>5. Operações</h4>
+                    <p>Será somado, ordenado, agrupado, filtrado ou indexado?</p>
+                  </div>
+                  <div class="card">
+                    <h4>6. Portabilidade</h4>
+                    <p>A solução ficará em um SGBD ou precisará migrar?</p>
+                  </div>
+                  <div class="card">
+                    <h4>7. Ausência</h4>
+                    <p><code>NULL</code> significa desconhecido, não aplicável ou dado ainda não recebido?</p>
+                  </div>
+                </div>
+              </div>
+            </details>
+            <details class="lesson" open>
+              <summary>0.2 Inteiros e a diferença entre BIGINT e BIGINT UNSIGNED</summary>
+              <div class="lesson-content">
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Tipo MySQL</th>
+                        <th>Bytes</th>
+                        <th>Com sinal</th>
+                        <th>UNSIGNED</th>
+                        <th>Uso frequente</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>TINYINT</td>
+                        <td>1</td>
+                        <td>-128 a 127</td>
+                        <td>0 a 255</td>
+                        <td>flags e escalas pequenas</td>
+                      </tr>
+                      <tr>
+                        <td>SMALLINT</td>
+                        <td>2</td>
+                        <td>-32.768 a 32.767</td>
+                        <td>0 a 65.535</td>
+                        <td>contagens limitadas</td>
+                      </tr>
+                      <tr>
+                        <td>MEDIUMINT</td>
+                        <td>3</td>
+                        <td>-8.388.608 a 8.388.607</td>
+                        <td>0 a 16.777.215</td>
+                        <td>opção específica do MySQL</td>
+                      </tr>
+                      <tr>
+                        <td>INT</td>
+                        <td>4</td>
+                        <td>-2.147.483.648 a 2.147.483.647</td>
+                        <td>0 a 4.294.967.295</td>
+                        <td>IDs e contadores comuns</td>
+                      </tr>
+                      <tr>
+                        <td>BIGINT</td>
+                        <td>8</td>
+                        <td>-9.223.372.036.854.775.808 a 9.223.372.036.854.775.807</td>
+                        <td>0 a 18.446.744.073.709.551.615</td>
+                        <td>alto volume e grandes acumulados</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="grid2">
+                  <div class="callout"><b>BIGINT:</b> reserva uma parte do intervalo para números negativos.</div>
+                  <div class="callout ok"><b>BIGINT UNSIGNED:</b> elimina negativos e praticamente dobra o máximo
+                    positivo.</div>
+                </div>
+                <div class="codebox">
+                  <div class="codebar">MySQL <button class="copy">Copiar</button></div>
+                  <pre><code>CREATE TABLE eventos (
+  id BIGINT UNSIGNED PRIMARY KEY,
+  bytes_processados BIGINT UNSIGNED NOT NULL,
+  variacao BIGINT NOT NULL
+);</code></pre>
+                </div>
+                <div class="callout warn"><b>Portabilidade:</b> <code>UNSIGNED</code> não é uma solução universal. Em
+                  PostgreSQL ou SQL Server, use um tipo com faixa suficiente e <code>CHECK (valor &gt;= 0)</code>.</div>
+                <div class="callout danger"><b>JavaScript:</b> <code>Number</code> só mantém inteiros exatos até
+                  9.007.199.254.740.991. IDs maiores devem trafegar como texto ou <code>BigInt</code>, sem conversão
+                  acidental para <code>Number</code>.</div>
+                <div class="calc">
+                  <div class="field"><label for="intType">Tipo</label><select id="intType">
+                      <option>TINYINT</option>
+                      <option>SMALLINT</option>
+                      <option>INT</option>
+                      <option>BIGINT</option>
+                    </select></div>
+                  <div class="field"><label for="unsigned">Sinal</label><select id="unsigned">
+                      <option value="signed">Com sinal</option>
+                      <option value="unsigned">UNSIGNED</option>
+                    </select></div><button class="btn cyan" id="intCalc">Ver faixa</button>
+                </div>
+                <div class="result" id="intResult">Selecione o tipo e calcule a faixa.</div>
+              </div>
+            </details>
+            <details class="lesson" open>
+              <summary>0.3 DECIMAL, FLOAT e DOUBLE: exatidão não é o mesmo que aproximação</summary>
+              <div class="lesson-content">
+                <p>Em <code>DECIMAL(12,2)</code>, <b>12</b> é a precisão total e <b>2</b> é a escala. Restam até 10
+                  dígitos antes do separador decimal.</p>
+                <div class="codebox">
+                  <div class="codebar">Valor financeiro exato <button class="copy">Copiar</button></div>
+                  <pre><code>CREATE TABLE lancamentos (
+  id BIGINT UNSIGNED PRIMARY KEY,
+  valor DECIMAL(15,2) NOT NULL,
+  taxa DECIMAL(9,6) NOT NULL
+);</code></pre>
+                </div>
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Critério</th>
+                        <th>DECIMAL</th>
+                        <th>FLOAT</th>
+                        <th>DOUBLE</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Representação</td>
+                        <td>decimal exata na escala declarada</td>
+                        <td>binária aproximada</td>
+                        <td>binária aproximada</td>
+                      </tr>
+                      <tr>
+                        <td>Precisão típica</td>
+                        <td>definida por p e s</td>
+                        <td>cerca de 7 dígitos significativos</td>
+                        <td>cerca de 15 a 16 dígitos significativos</td>
+                      </tr>
+                      <tr>
+                        <td>Indicação</td>
+                        <td>dinheiro, tarifas, impostos</td>
+                        <td>medições aproximadas</td>
+                        <td>ciência, engenharia, modelos</td>
+                      </tr>
+                      <tr>
+                        <td>Igualdade</td>
+                        <td>previsível na escala</td>
+                        <td>use tolerância</td>
+                        <td>use tolerância</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="callout danger"><b>Por que não <code>FLOAT(12,2)</code>?</b> A notação não torna o valor
+                  decimal exato. O armazenamento continua em ponto flutuante binário. No MySQL moderno, não use essa
+                  forma como mecanismo de precisão.</div>
+                <div class="callout"><b>Regra prática:</b> dinheiro e percentuais contratuais pedem
+                  <code>DECIMAL</code>. Sensores e resultados estatísticos podem usar <code>FLOAT</code> ou, com mais
+                  precisão aproximada, <code>DOUBLE</code>.</div>
+                <div class="calc">
+                  <div class="field"><label for="precision">Precisão p</label><input id="precision" type="number"
+                      min="1" max="65" value="12"></div>
+                  <div class="field"><label for="scale">Escala s</label><input id="scale" type="number" min="0" max="30"
+                      value="2"></div><button class="btn cyan" id="decCalc">Calcular DECIMAL</button>
+                </div>
+                <div class="result" id="decResult">DECIMAL(12,2): 10 dígitos inteiros e 2 casas decimais.</div>
+                <div class="callout warn"><b>Centavos como inteiro:</b> armazenar R$ 123,45 como 12.345 pode ser válido,
+                  mas exige unidade explícita, conversão consistente e regras de arredondamento para taxas e rateios.
+                </div>
+              </div>
+            </details>
+            <details class="lesson">
+              <summary>0.4 CHAR, VARCHAR, TEXT e Unicode</summary>
+              <div class="lesson-content">
+                <div class="grid2">
+                  <div class="card">
+                    <h4>CHAR(n)</h4>
+                    <p>Comprimento fixo. Bom para UF, códigos realmente fixos e hashes com tamanho estável.</p>
+                    <div class="codebox">
+                      <pre><code>uf CHAR(2)</code></pre>
+                    </div>
+                  </div>
+                  <div class="card">
+                    <h4>VARCHAR(n)</h4>
+                    <p>Comprimento variável. Bom para nomes, e-mails, descrições curtas e códigos variáveis.</p>
+                    <div class="codebox">
+                      <pre><code>nome VARCHAR(150)</code></pre>
+                    </div>
+                  </div>
+                </div>
+                <p><code>TEXT</code> serve para conteúdo extenso, mas não deve ser a escolha automática. Limites,
+                  indexação e comportamento variam por SGBD.</p>
+                <div class="callout"><b>Caracteres e bytes:</b> com Unicode, um caractere pode consumir vários bytes. No
+                  MySQL moderno, <code>utf8mb4</code> é a escolha usual para cobrir todo o Unicode.</div>
+                <div class="codebox">
+                  <div class="codebar">MySQL 8 <button class="copy">Copiar</button></div>
+                  <pre><code>nome VARCHAR(150)
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_0900_ai_ci</code></pre>
+                </div>
+                <p>A collation determina regras de comparação e ordenação, inclusive sensibilidade a acentos e
+                  maiúsculas.</p>
+              </div>
+            </details>
+            <details class="lesson">
+              <summary>0.5 Dados que parecem números, mas são identificadores</summary>
+              <div class="lesson-content">
+                <div class="callout danger"><b>CPF, CNPJ, CEP, telefone, matrícula e contrato não são quantidades.</b>
+                  Não são somados, podem começar com zero e possuem regras próprias. Em geral, use texto.</div>
+                <div class="codebox">
+                  <div class="codebar">Modelagem sem máscara <button class="copy">Copiar</button></div>
+                  <pre><code>cpf CHAR(11) NOT NULL,
+cnpj CHAR(14),
+cep CHAR(8),
+telefone VARCHAR(20)</code></pre>
+                </div>
+                <p>A máscara de exibição pode ficar na aplicação. O tipo correto não substitui validação, governança,
+                  controle de acesso e proteção de dados pessoais.</p>
+              </div>
+            </details>
+            <details class="lesson">
+              <summary>0.6 DATE, TIME, DATETIME e TIMESTAMP</summary>
+              <div class="lesson-content">
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Tipo</th>
+                        <th>Representa</th>
+                        <th>Exemplo</th>
+                        <th>Cuidado</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>DATE</td>
+                        <td>data de calendário</td>
+                        <td>data de nascimento</td>
+                        <td>não inventar horário</td>
+                      </tr>
+                      <tr>
+                        <td>TIME</td>
+                        <td>hora ou duração, conforme SGBD</td>
+                        <td>horário de abertura</td>
+                        <td>sem data e fuso</td>
+                      </tr>
+                      <tr>
+                        <td>DATETIME</td>
+                        <td>data e hora civil</td>
+                        <td>agendamento local</td>
+                        <td>sem conversão automática universal</td>
+                      </tr>
+                      <tr>
+                        <td>TIMESTAMP</td>
+                        <td>instante ou data/hora, conforme SGBD</td>
+                        <td>evento e auditoria</td>
+                        <td>faixa e fuso variam</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="diagram">
+                  <div class="bubble">Horário local<br>15:00</div>
+                  <div class="arrow">→</div>
+                  <div class="bubble">Fuso<br>America/Sao_Paulo</div>
+                  <div class="arrow">→</div>
+                  <div class="bubble">Instante<br>UTC</div>
+                </div>
+                <div class="callout warn">Não use <code>'1900-01-01'</code> como “data desconhecida” sem uma regra de
+                  negócio explícita. Em muitos casos, <code>NULL</code> comunica melhor a ausência.</div>
+              </div>
+            </details>
+            <details class="lesson">
+              <summary>0.7 BOOLEAN, binários, UUID, JSON e ENUM</summary>
+              <div class="lesson-content">
+                <div class="grid2">
+                  <div class="card">
+                    <h4>BOOLEAN</h4>
+                    <p>No MySQL, <code>BOOLEAN</code> é tratado como sinônimo de <code>TINYINT(1)</code>. O número 1 não
+                      limita o domínio sozinho.</p>
+                    <div class="codebox">
+                      <pre><code>ativo BOOLEAN NOT NULL,
+CHECK (ativo IN (0,1))</code></pre>
+                    </div>
+                  </div>
+                  <div class="card">
+                    <h4>Binários</h4>
+                    <p><code>BINARY</code>, <code>VARBINARY</code> e <code>BLOB</code> guardam bytes. Para arquivos
+                      grandes, compare BLOB com armazenamento externo e referência.</p>
+                  </div>
+                  <div class="card">
+                    <h4>UUID</h4>
+                    <p>Texto é legível, mas maior. Tipo nativo ou binário pode gerar índices menores. UUID aleatório
+                      pode aumentar fragmentação de índice.</p>
+                  </div>
+                  <div class="card">
+                    <h4>JSON</h4>
+                    <p>Útil para atributos flexíveis e payloads. Não deve esconder relacionamentos estáveis nem
+                      substituir modelagem relacional sem motivo.</p>
+                  </div>
+                </div>
+                <div class="callout"><b>ENUM:</b> oferece domínio compacto em alguns SGBDs, mas aumenta acoplamento ao
+                  esquema. Uma tabela de domínio ou <code>CHECK</code> costuma ser mais portável.</div>
+              </div>
+            </details>
+            <details class="lesson">
+              <summary>0.8 NULL, conversões e impacto no desempenho</summary>
+              <div class="lesson-content">
+                <div class="grid4">
+                  <div class="card">
+                    <h4>NULL</h4>
+                    <p>ausente, desconhecido ou não aplicável</p>
+                  </div>
+                  <div class="card">
+                    <h4>''</h4>
+                    <p>texto presente com zero caracteres</p>
+                  </div>
+                  <div class="card">
+                    <h4>0</h4>
+                    <p>valor numérico zero</p>
+                  </div>
+                  <div class="card">
+                    <h4>'0'</h4>
+                    <p>texto contendo zero</p>
+                  </div>
+                </div>
+                <div class="codebox">
+                  <pre><code>WHERE gerente_id IS NULL
+-- nunca: gerente_id = NULL
+
+SELECT COALESCE(apelido, nome) AS nome_exibicao;</code></pre>
+                </div>
+                <div class="callout danger"><b>Conversão implícita:</b> comparar <code>VARCHAR</code> com número pode
+                  causar resultados inesperados e dificultar o uso de índices. Alinhe os tipos desde a modelagem.</div>
+                <div class="codebox">
+                  <pre><code>-- Evite tipos incompatíveis
+clientes.id            BIGINT UNSIGNED
+pedidos.cliente_id     BIGINT UNSIGNED</code></pre>
+                </div>
+                <ul>
+                  <li>Tipos menores tornam índices e buffers potencialmente mais compactos.</li>
+                  <li>Chave estrangeira deve ser compatível com a chave referenciada.</li>
+                  <li>Funções sobre a coluna filtrada podem impedir busca eficiente por índice.</li>
+                  <li><code>VARCHAR(255)</code> em tudo não substitui a definição do domínio.</li>
+                </ul>
+              </div>
+            </details>
+            <details class="lesson" open>
+              <summary>0.9 Oficina: corrija um esquema frágil</summary>
+              <div class="lesson-content">
+                <div class="codebox">
+                  <div class="codebar">Antes <button class="copy">Copiar</button></div>
+                  <pre><code>CREATE TABLE vendas (
+  id VARCHAR(255),
+  cpf BIGINT,
+  valor FLOAT(12,2),
+  data_venda VARCHAR(30),
+  ativo VARCHAR(10),
+  quantidade BIGINT
+);</code></pre>
+                </div>
+                <div class="codebox">
+                  <div class="codebar">Uma proposta melhor, dependente do domínio <button class="copy">Copiar</button>
+                  </div>
+                  <pre><code>CREATE TABLE vendas (
+  id BIGINT UNSIGNED PRIMARY KEY,
+  cpf CHAR(11) NOT NULL,
+  valor DECIMAL(15,2) NOT NULL,
+  data_venda DATETIME NOT NULL,
+  ativo BOOLEAN NOT NULL,
+  quantidade INT UNSIGNED NOT NULL,
+  CHECK (quantidade &gt;= 0)
+);</code></pre>
+                </div>
+                <div class="callout warn">Essa não é uma resposta universal. Volume, dialeto, regras de privacidade,
+                  fuso, exclusão lógica e integração podem mudar a decisão.</div>
+              </div>
+            </details>
+            <div class="quiz" data-quiz="m0">
+              <h3>Verificação rápida do Módulo 0</h3>
+              <div class="q" data-answer="b"><b>1. Qual tipo é a escolha inicial para R$ 1.234,56?</b><label><input
+                    type="radio" name="m0q1" value="a"> FLOAT(12,2)</label><label><input type="radio" name="m0q1"
+                    value="b"> DECIMAL(12,2)</label><label><input type="radio" name="m0q1" value="c">
+                  VARCHAR(12)</label>
+                <div class="feedback"></div>
+              </div>
+              <div class="q" data-answer="c"><b>2. Por que CPF normalmente é texto?</b><label><input type="radio"
+                    name="m0q2" value="a"> Porque texto sempre ocupa menos</label><label><input type="radio" name="m0q2"
+                    value="b"> Porque CPF aceita casas decimais</label><label><input type="radio" name="m0q2" value="c">
+                  Porque é identificador, pode ter zero inicial e não participa de aritmética</label>
+                <div class="feedback"></div>
+              </div><button class="btn quizCheck">Verificar</button>
+            </div>
+            <div class="complete"><button class="btn completeBtn">Marcar módulo como concluído</button></div>
+          </div>
+        </section>
+
+        <section class="module" id="m1" data-title="1. Conceitos básicos">
+          <div class="module-head">
+            <div class="mod-num">1</div>
+            <div>
+              <h2>Banco de dados, SGBD e linguagem SQL</h2>
+              <p>Separe a linguagem, o software gerenciador e a organização lógica dos dados.</p>
+            </div>
+          </div>
+          <div class="module-body">
+            <div class="grid3">
+              <div class="card">
+                <h4>Banco de dados</h4>
+                <p>Coleção organizada de dados projetada para acesso, integridade e atualização.</p>
+              </div>
+              <div class="card">
+                <h4>SGBD</h4>
+                <p>Software que cria, armazena, protege, consulta e administra bancos de dados.</p>
+              </div>
+              <div class="card">
+                <h4>SGBDR</h4>
+                <p>SGBD relacional, com dados estruturados em relações, normalmente apresentadas como tabelas.</p>
+              </div>
+            </div>
+            <div class="callout"><b>SQL é a linguagem.</b> MySQL, PostgreSQL, SQL Server, Oracle e SQLite são produtos
+              com dialetos e capacidades distintas.</div>
+            <details class="lesson" open>
+              <summary>Famílias de comandos</summary>
+              <div class="lesson-content">
+                <div class="grid3">
+                  <div class="card">
+                    <h4>DDL</h4>
+                    <p>Define estruturas: CREATE, ALTER, DROP.</p>
+                  </div>
+                  <div class="card">
+                    <h4>DML</h4>
+                    <p>Manipula linhas: INSERT, UPDATE, DELETE.</p>
+                  </div>
+                  <div class="card">
+                    <h4>DQL</h4>
+                    <p>Consulta dados: SELECT.</p>
+                  </div>
+                  <div class="card">
+                    <h4>DCL</h4>
+                    <p>Controla privilégios: GRANT, REVOKE.</p>
+                  </div>
+                  <div class="card">
+                    <h4>TCL</h4>
+                    <p>Controla transações: COMMIT, ROLLBACK.</p>
+                  </div>
+                </div>
+              </div>
+            </details>
+            <div class="complete"><button class="btn completeBtn">Marcar módulo como concluído</button></div>
+          </div>
+        </section>
+
+        <section class="module" id="m2" data-title="2. DDL e DML">
+          <div class="module-head">
+            <div class="mod-num">2</div>
+            <div>
+              <h2>Criação e manipulação de dados</h2>
+              <p>Construa estruturas e altere dados com cautela e intenção explícita.</p>
+            </div>
+          </div>
+          <div class="module-body">
+            <div class="codebox">
+              <div class="codebar">Tabela base <button class="copy">Copiar</button></div>
+              <pre><code>CREATE TABLE funcionarios (
+  id BIGINT UNSIGNED PRIMARY KEY,
+  nome VARCHAR(120) NOT NULL,
+  salario DECIMAL(12,2),
+  departamento_id BIGINT UNSIGNED
+);
+
+INSERT INTO funcionarios (id,nome,salario)
+VALUES (1,'Priscila',5200.00);
+
+UPDATE funcionarios
+SET salario = 5500.00
+WHERE id = 1;</code></pre>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Comando</th>
+                    <th>Remove linhas?</th>
+                    <th>Mantém estrutura?</th>
+                    <th>WHERE?</th>
+                    <th>Observação</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>DELETE</td>
+                    <td>sim</td>
+                    <td>sim</td>
+                    <td>sim</td>
+                    <td>comando DML; rollback depende da transação</td>
+                  </tr>
+                  <tr>
+                    <td>TRUNCATE</td>
+                    <td>todas</td>
+                    <td>sim</td>
+                    <td>não</td>
+                    <td>efeito transacional varia por SGBD</td>
+                  </tr>
+                  <tr>
+                    <td>DROP</td>
+                    <td>remove o objeto</td>
+                    <td>não</td>
+                    <td>não</td>
+                    <td>elimina definição e dados</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="callout danger"><b>Execute primeiro como SELECT.</b> Antes de UPDATE ou DELETE, valide o mesmo
+              <code>WHERE</code> em uma consulta e confira a cardinalidade.</div>
+            <div class="complete"><button class="btn completeBtn">Marcar módulo como concluído</button></div>
+          </div>
+        </section>
+
+        <section class="module" id="m3" data-title="3. Filtros e ordenação">
+          <div class="module-head">
+            <div class="mod-num">3</div>
+            <div>
+              <h2>Consultas, filtros e ordenação</h2>
+              <p>Recupere apenas as linhas e colunas necessárias, na ordem necessária.</p>
+            </div>
+          </div>
+          <div class="module-body">
+            <div class="codebox">
+              <div class="codebar">Consulta composta <button class="copy">Copiar</button></div>
+              <pre><code>SELECT nome AS funcionario, salario
+FROM funcionarios
+WHERE departamento_id IN (10,20)
+  AND salario BETWEEN 3000 AND 8000
+  AND nome LIKE 'A%'
+ORDER BY salario DESC
+LIMIT 5;</code></pre>
+            </div>
+            <div class="grid3">
+              <div class="card">
+                <h4>WHERE</h4>
+                <p>Filtra linhas antes do agrupamento.</p>
+              </div>
+              <div class="card">
+                <h4>DISTINCT</h4>
+                <p>Remove duplicatas do conjunto projetado.</p>
+              </div>
+              <div class="card">
+                <h4>ORDER BY</h4>
+                <p>Define a ordenação do resultado final.</p>
+              </div>
+              <div class="card">
+                <h4>LIKE</h4>
+                <p><code>%</code> representa qualquer sequência; <code>_</code>, um caractere.</p>
+              </div>
+              <div class="card">
+                <h4>IS NULL</h4>
+                <p>Testa ausência. Não use <code>= NULL</code>.</p>
+              </div>
+              <div class="card">
+                <h4>LIMIT/TOP</h4>
+                <p>A sintaxe muda por dialeto. Combine com ORDER BY para um Top N determinístico.</p>
+              </div>
+            </div>
+            <div class="complete"><button class="btn completeBtn">Marcar módulo como concluído</button></div>
+          </div>
+        </section>
+
+        <section class="module" id="m4" data-title="4. Funções SQL">
+          <div class="module-head">
+            <div class="mod-num">4</div>
+            <div>
+              <h2>Funções de agregação, texto, número e data</h2>
+              <p>Transforme valores e produza medidas sem perder a semântica dos nulos.</p>
+            </div>
+          </div>
+          <div class="module-body">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Grupo</th>
+                    <th>Funções usuais</th>
+                    <th>Ponto de atenção</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Agregação</td>
+                    <td>COUNT, SUM, AVG, MIN, MAX</td>
+                    <td>COUNT(coluna) ignora NULL; COUNT(*) conta linhas</td>
+                  </tr>
+                  <tr>
+                    <td>Texto</td>
+                    <td>UPPER, LOWER, LENGTH, CONCAT, SUBSTRING</td>
+                    <td>nome e comportamento variam</td>
+                  </tr>
+                  <tr>
+                    <td>Numérico</td>
+                    <td>ROUND, CEIL, FLOOR, ABS, POWER</td>
+                    <td>defina regra de arredondamento</td>
+                  </tr>
+                  <tr>
+                    <td>Data</td>
+                    <td>CURRENT_DATE, NOW, DATEDIFF</td>
+                    <td>Datediff e intervalos variam por SGBD</td>
+                  </tr>
+                  <tr>
+                    <td>Nulos</td>
+                    <td>COALESCE, NULLIF</td>
+                    <td>não substitua ausência sem compreender a regra</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="codebox">
+              <pre><code>SELECT departamento_id,
+       COUNT(*) AS linhas,
+       COUNT(salario) AS salarios_informados,
+       AVG(salario) AS media_salario
+FROM funcionarios
+GROUP BY departamento_id;</code></pre>
+            </div>
+            <div class="complete"><button class="btn completeBtn">Marcar módulo como concluído</button></div>
+          </div>
+        </section>
+
+        <section class="module" id="m5" data-title="5. GROUP BY e JOIN">
+          <div class="module-head">
+            <div class="mod-num">5</div>
+            <div>
+              <h2>Agrupamento e junções</h2>
+              <p>Resuma grupos e combine tabelas sem duplicar ou perder linhas por acidente.</p>
+            </div>
+          </div>
+          <div class="module-body">
+            <div class="grid2">
+              <div class="callout"><b>WHERE:</b> filtra linhas antes de agrupar.</div>
+              <div class="callout ok"><b>HAVING:</b> filtra grupos depois de agregados.</div>
+            </div>
+            <div class="codebox">
+              <pre><code>SELECT d.nome, COUNT(f.id) AS quantidade
+FROM departamentos AS d
+LEFT JOIN funcionarios AS f
+  ON f.departamento_id = d.id
+WHERE d.ativo = 1
+GROUP BY d.id, d.nome
+HAVING COUNT(f.id) &gt; 2
+ORDER BY quantidade DESC;</code></pre>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>JOIN</th>
+                    <th>Retorno</th>
+                    <th>Risco típico</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>INNER</td>
+                    <td>somente correspondências</td>
+                    <td>perder linhas sem vínculo</td>
+                  </tr>
+                  <tr>
+                    <td>LEFT</td>
+                    <td>todas da esquerda e correspondências</td>
+                    <td>filtro da direita no WHERE converter o efeito em INNER</td>
+                  </tr>
+                  <tr>
+                    <td>RIGHT</td>
+                    <td>todas da direita</td>
+                    <td>leitura menos intuitiva; pode reescrever como LEFT</td>
+                  </tr>
+                  <tr>
+                    <td>FULL</td>
+                    <td>todas de ambos os lados</td>
+                    <td>não suportado diretamente em MySQL</td>
+                  </tr>
+                  <tr>
+                    <td>CROSS</td>
+                    <td>produto cartesiano</td>
+                    <td>explosão de cardinalidade</td>
+                  </tr>
+                  <tr>
+                    <td>SELF</td>
+                    <td>tabela com ela mesma</td>
+                    <td>condição de junção incorreta</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="complete"><button class="btn completeBtn">Marcar módulo como concluído</button></div>
+          </div>
+        </section>
+
+        <section class="module" id="m6" data-title="6. Restrições e normalização">
+          <div class="module-head">
+            <div class="mod-num">6</div>
+            <div>
+              <h2>Restrições, integridade e normalização</h2>
+              <p>Transforme regras de negócio em garantias do banco e reduza redundâncias perigosas.</p>
+            </div>
+          </div>
+          <div class="module-body">
+            <div class="grid3">
+              <div class="card">
+                <h4>PRIMARY KEY</h4>
+                <p>Identifica unicamente cada linha.</p>
+              </div>
+              <div class="card">
+                <h4>FOREIGN KEY</h4>
+                <p>Garante referência válida entre relações.</p>
+              </div>
+              <div class="card">
+                <h4>UNIQUE</h4>
+                <p>Evita repetição de uma chave candidata.</p>
+              </div>
+              <div class="card">
+                <h4>NOT NULL</h4>
+                <p>Exige presença de valor.</p>
+              </div>
+              <div class="card">
+                <h4>CHECK</h4>
+                <p>Restringe o domínio por expressão.</p>
+              </div>
+              <div class="card">
+                <h4>DEFAULT</h4>
+                <p>Preenche valor quando omitido, não quando NULL é enviado.</p>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Forma</th>
+                    <th>Propósito resumido</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1FN</td>
+                    <td>valores atômicos e ausência de grupos repetitivos</td>
+                  </tr>
+                  <tr>
+                    <td>2FN</td>
+                    <td>1FN e nenhuma dependência parcial de chave composta</td>
+                  </tr>
+                  <tr>
+                    <td>3FN</td>
+                    <td>2FN e nenhuma dependência transitiva inadequada</td>
+                  </tr>
+                  <tr>
+                    <td>BCNF</td>
+                    <td>todo determinante não trivial é chave candidata</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="callout warn">Normalização melhora integridade, mas modelos analíticos podem usar
+              desnormalização deliberada. A decisão deve ser explícita e mensurada.</div>
+            <div class="complete"><button class="btn completeBtn">Marcar módulo como concluído</button></div>
+          </div>
+        </section>
+
+        <section class="module" id="m7" data-title="7. Subconsultas e conjuntos">
+          <div class="module-head">
+            <div class="mod-num">7</div>
+            <div>
+              <h2>Subconsultas e operadores de conjunto</h2>
+              <p>Expresse dependências lógicas e combine resultados compatíveis.</p>
+            </div>
+          </div>
+          <div class="module-body">
+            <div class="codebox">
+              <pre><code>-- Salário acima da média geral
+SELECT nome, salario
+FROM funcionarios
+WHERE salario &gt; (SELECT AVG(salario) FROM funcionarios);
+
+-- Departamentos com ao menos um funcionário
+SELECT d.nome
+FROM departamentos d
+WHERE EXISTS (
+  SELECT 1 FROM funcionarios f
+  WHERE f.departamento_id = d.id
+);</code></pre>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Operador</th>
+                    <th>Resultado</th>
+                    <th>Duplicatas</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>UNION</td>
+                    <td>linhas de ambas as consultas</td>
+                    <td>remove</td>
+                  </tr>
+                  <tr>
+                    <td>UNION ALL</td>
+                    <td>linhas de ambas</td>
+                    <td>preserva</td>
+                  </tr>
+                  <tr>
+                    <td>INTERSECT</td>
+                    <td>linhas comuns</td>
+                    <td>depende da variante/dialeto</td>
+                  </tr>
+                  <tr>
+                    <td>EXCEPT</td>
+                    <td>primeira menos segunda</td>
+                    <td>depende da variante/dialeto</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="callout">As consultas de um operador de conjunto precisam retornar o mesmo número de colunas, em
+              posições com tipos compatíveis.</div>
+            <div class="complete"><button class="btn completeBtn">Marcar módulo como concluído</button></div>
+          </div>
+        </section>
+
+        <section class="module" id="m8" data-title="8. SQL avançado">
+          <div class="module-head">
+            <div class="mod-num">8</div>
+            <div>
+              <h2>Views, índices, CTEs e funções de janela</h2>
+              <p>Melhore a legibilidade, a reutilização e a análise sobre conjuntos relacionados.</p>
+            </div>
+          </div>
+          <div class="module-body">
+            <div class="grid3">
+              <div class="card">
+                <h4>VIEW</h4>
+                <p>Consulta nomeada apresentada como tabela virtual. Pode simplificar acesso e segurança.</p>
+              </div>
+              <div class="card">
+                <h4>INDEX</h4>
+                <p>Estrutura de acesso que acelera certos filtros e joins, com custo de espaço e escrita.</p>
+              </div>
+              <div class="card">
+                <h4>CTE</h4>
+                <p>Resultado nomeado dentro de uma instrução. Favorece decomposição e recursão.</p>
+              </div>
+            </div>
+            <div class="codebox">
+              <pre><code>WITH ranking AS (
+  SELECT nome, departamento_id, salario,
+         DENSE_RANK() OVER (
+           PARTITION BY departamento_id
+           ORDER BY salario DESC
+         ) AS posicao
+  FROM funcionarios
+)
+SELECT *
+FROM ranking
+WHERE posicao &lt;= 3;</code></pre>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Função</th>
+                    <th>Empates</th>
+                    <th>Sequência</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ROW_NUMBER</td>
+                    <td>cada linha recebe número diferente</td>
+                    <td>1,2,3,4</td>
+                  </tr>
+                  <tr>
+                    <td>RANK</td>
+                    <td>mesma posição</td>
+                    <td>1,2,2,4</td>
+                  </tr>
+                  <tr>
+                    <td>DENSE_RANK</td>
+                    <td>mesma posição</td>
+                    <td>1,2,2,3</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="complete"><button class="btn completeBtn">Marcar módulo como concluído</button></div>
+          </div>
+        </section>
+
+        <section class="module" id="m9" data-title="9. Transações e otimização">
+          <div class="module-head">
+            <div class="mod-num">9</div>
+            <div>
+              <h2>Transações, concorrência e desempenho</h2>
+              <p>Proteja unidades de trabalho e investigue gargalos com evidência.</p>
+            </div>
+          </div>
+          <div class="module-body">
+            <div class="grid4">
+              <div class="card">
+                <h4>Atomicidade</h4>
+                <p>Tudo ocorre ou nada ocorre.</p>
+              </div>
+              <div class="card">
+                <h4>Consistência</h4>
+                <p>Regras permanecem válidas.</p>
+              </div>
+              <div class="card">
+                <h4>Isolamento</h4>
+                <p>Concorrência obedece ao nível definido.</p>
+              </div>
+              <div class="card">
+                <h4>Durabilidade</h4>
+                <p>Commit confirmado persiste.</p>
+              </div>
+            </div>
+            <div class="codebox">
+              <pre><code>START TRANSACTION;
+UPDATE contas SET saldo = saldo - 5000 WHERE id = 1;
+UPDATE contas SET saldo = saldo + 5000 WHERE id = 2;
+COMMIT;</code></pre>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Isolamento</th>
+                    <th>Leitura suja</th>
+                    <th>Não repetível</th>
+                    <th>Fantasma</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>READ UNCOMMITTED</td>
+                    <td>possível</td>
+                    <td>possível</td>
+                    <td>possível</td>
+                  </tr>
+                  <tr>
+                    <td>READ COMMITTED</td>
+                    <td>impedida</td>
+                    <td>possível</td>
+                    <td>possível</td>
+                  </tr>
+                  <tr>
+                    <td>REPEATABLE READ</td>
+                    <td>impedida</td>
+                    <td>impedida</td>
+                    <td>o padrão SQL permite; implementação pode proteger mais</td>
+                  </tr>
+                  <tr>
+                    <td>SERIALIZABLE</td>
+                    <td>impedida</td>
+                    <td>impedida</td>
+                    <td>impedida</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="callout"><b>Otimização:</b> selecione colunas necessárias, filtre cedo quando semanticamente
+              válido, alinhe tipos, crie índices guiados por consultas e valide com <code>EXPLAIN</code> e medições.
+            </div>
+            <div class="complete"><button class="btn completeBtn">Marcar módulo como concluído</button></div>
+          </div>
+        </section>
+
+        <section class="module" id="m10" data-title="10. Revisão e entrevistas">
+          <div class="module-head">
+            <div class="mod-num">10</div>
+            <div>
+              <h2>Revisão aplicada e preparação para entrevistas</h2>
+              <p>Explique a decisão, escreva a consulta e verifique os casos extremos.</p>
+            </div>
+          </div>
+          <div class="module-body">
+            <div class="grid2">
+              <div class="card">
+                <h4>Checklist de consulta</h4>
+                <ol>
+                  <li>Entender o grão do resultado.</li>
+                  <li>Identificar tabelas e cardinalidades.</li>
+                  <li>Projetar só as colunas necessárias.</li>
+                  <li>Aplicar filtros e tratar NULL.</li>
+                  <li>Agrupar apenas quando necessário.</li>
+                  <li>Validar duplicações após JOIN.</li>
+                  <li>Ordenar e limitar de forma determinística.</li>
+                  <li>Analisar o plano e medir.</li>
+                </ol>
+              </div>
+              <div class="card">
+                <h4>Perguntas essenciais</h4>
+                <ol>
+                  <li>DELETE, TRUNCATE e DROP?</li>
+                  <li>WHERE e HAVING?</li>
+                  <li>INNER e LEFT JOIN?</li>
+                  <li>COUNT(*) e COUNT(coluna)?</li>
+                  <li>DECIMAL e FLOAT?</li>
+                  <li>UNION e UNION ALL?</li>
+                  <li>ROW_NUMBER, RANK e DENSE_RANK?</li>
+                  <li>Índice composto e ordem das colunas?</li>
+                </ol>
+              </div>
+            </div>
+            <details class="lesson" open>
+              <summary>Desafios de prática</summary>
+              <div class="lesson-content">
+                <ol>
+                  <li>Obtenha os três maiores salários por departamento.</li>
+                  <li>Encontre clientes que não fizeram pedidos nos últimos seis meses.</li>
+                  <li>Deduplicate eventos, preservando o registro mais recente.</li>
+                  <li>Compare faturamento mensal com o mês anterior usando <code>LAG</code>.</li>
+                  <li>Revise uma tabela e justifique cada tipo de dado.</li>
+                </ol>
+              </div>
+            </details>
+            <div class="callout ok"><b>Mantra final:</b> compreenda o grão, preserve a semântica, verifique
+              cardinalidade, trate nulos e meça desempenho.</div>
+            <div class="complete"><button class="btn completeBtn">Marcar módulo como concluído</button></div>
+          </div>
+        </section>
+
+        <section class="module" id="glossario" data-title="Glossário">
+          <div class="module-head">
+            <div class="mod-num">A-Z</div>
+            <div>
+              <h2>Glossário rápido</h2>
+              <p>Termos para consulta durante o trabalho.</p>
+            </div>
+          </div>
+          <div class="module-body">
+            <div class="glossary">
+              <div class="term"><b>Cardinalidade</b><br>Quantidade de valores distintos ou relação de ocorrência entre
+                tabelas, conforme o contexto.</div>
+              <div class="term"><b>Dialeto</b><br>Variação da linguagem SQL implementada por um produto.</div>
+              <div class="term"><b>Domínio</b><br>Conjunto de valores válidos para um atributo.</div>
+              <div class="term"><b>Escala</b><br>Número de dígitos após o separador decimal.</div>
+              <div class="term"><b>Grão</b><br>O que uma linha representa no conjunto.</div>
+              <div class="term"><b>Índice</b><br>Estrutura auxiliar de acesso aos dados.</div>
+              <div class="term"><b>Precisão</b><br>Total de dígitos de um número decimal.</div>
+              <div class="term"><b>Sargável</b><br>Predicado que pode favorecer uma busca eficiente por índice.</div>
+              <div class="term"><b>Transação</b><br>Unidade lógica de trabalho sujeita a commit ou rollback.</div>
+            </div>
+          </div>
+        </section>
+        <footer>Inspiração: Conteúdo adaptado da apostila “SQL__FUNDAMENTOS”: linkedin <a
+            href="https://www.linkedin.com/in/lucas-engenharia/">Lucas Araújo</a> e tecnicamente revisado.<br>
+          Referência principal de exemplos: MySQL; diferenças de PostgreSQL, SQL Server, Oracle e SQLite devem ser
+          verificadas na documentação da versão utilizada.<br>Gerado em Agosto-2026 • Progresso salvo localmente
+          <p>&copy; 2026 Gerência de Eficiência e Suporte Operacional. #MultiplicarEficiência.</p>
+        </footer>
+      </main>
+    </div>
+  </div>
+  <script>
+    (() => {
+      'use strict';
+      const modules = [...document.querySelectorAll('.module[data-title]')]; const core = modules.filter(m => /^m\d+$/.test(m.id)); const key = 'sqlFundamentosProgressV1'; let done = new Set(JSON.parse(localStorage.getItem(key) || '[]'));
+      const nav = document.getElementById('nav'), mobile = document.getElementById('mobileNav'); modules.forEach(m => { const a = document.createElement('a'); a.href = '#' + m.id; a.textContent = m.dataset.title; a.dataset.id = m.id; nav.appendChild(a); const o = document.createElement('option'); o.value = m.id; o.textContent = m.dataset.title; mobile.appendChild(o) });
+      function refresh() { core.forEach(m => { const b = m.querySelector('.completeBtn'); const yes = done.has(m.id); if (b) { b.textContent = yes ? '✓ Módulo concluído' : 'Marcar módulo como concluído'; b.classList.toggle('done', yes) } const a = nav.querySelector(`[data-id="${m.id}"]`); if (a) a.classList.toggle('done', yes) }); const pct = Math.round(done.size / core.length * 100); document.getElementById('progressBar').style.width = pct + '%'; document.getElementById('progressLabel').textContent = pct + '%'; localStorage.setItem(key, JSON.stringify([...done])) }
+      document.querySelectorAll('.completeBtn').forEach(b => b.addEventListener('click', () => { const id = b.closest('.module').id; done.has(id) ? done.delete(id) : done.add(id); refresh() })); refresh();
+      mobile.addEventListener('change', () => document.getElementById(mobile.value).scrollIntoView({ behavior: 'smooth' })); document.getElementById('startBtn').onclick = () => document.getElementById('m0').scrollIntoView({ behavior: 'smooth' });
+      let expanded = false; document.getElementById('expandBtn').onclick = e => { expanded = !expanded; document.querySelectorAll('.lesson').forEach(d => d.open = expanded); e.currentTarget.textContent = expanded ? 'Recolher aulas' : 'Expandir aulas' };
+      document.getElementById('themeBtn').onclick = () => { const n = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = n; localStorage.setItem('sqlTheme', n) }; document.documentElement.dataset.theme = localStorage.getItem('sqlTheme') || 'light';
+      document.getElementById('printBtn').onclick = () => { document.querySelectorAll('.lesson').forEach(d => d.open = true); window.print() }; document.getElementById('resetBtn').onclick = () => { if (confirm('Reiniciar todo o progresso e os quizzes?')) { done.clear(); localStorage.removeItem(key); document.querySelectorAll('input[type=radio]').forEach(i => i.checked = false); document.querySelectorAll('.feedback').forEach(f => { f.className = 'feedback'; f.textContent = '' }); refresh() } };
+      document.getElementById('saveBtn').onclick = () => { const blob = new Blob(['<!doctype html>\n' + document.documentElement.outerHTML], { type: 'text/html;charset=utf-8' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'apostila_sql_fundamentos_interativa.html'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1500) };
+      document.querySelectorAll('.copy').forEach(b => b.onclick = async () => { const t = b.closest('.codebox').querySelector('code').innerText; try { await navigator.clipboard.writeText(t); b.textContent = 'Copiado ✓' } catch { const x = document.createElement('textarea'); x.value = t; document.body.appendChild(x); x.select(); document.execCommand('copy'); x.remove(); b.textContent = 'Copiado ✓' } setTimeout(() => b.textContent = 'Copiar', 1400) });
+      document.querySelectorAll('.quizCheck').forEach(b => b.onclick = () => { b.closest('.quiz').querySelectorAll('.q').forEach(q => { const s = q.querySelector('input:checked'), f = q.querySelector('.feedback'); f.classList.add('show'); if (s && s.value === q.dataset.answer) { f.className = 'feedback show good'; f.textContent = 'Correto. A escolha preserva a semântica e evita erros silenciosos.' } else { f.className = 'feedback show bad'; f.textContent = 'Revise a explicação acima e tente novamente.' } }) });
+      const ranges = { TINYINT: { signed: ['-128', '127'], unsigned: ['0', '255'] }, SMALLINT: { signed: ['-32.768', '32.767'], unsigned: ['0', '65.535'] }, INT: { signed: ['-2.147.483.648', '2.147.483.647'], unsigned: ['0', '4.294.967.295'] }, BIGINT: { signed: ['-9.223.372.036.854.775.808', '9.223.372.036.854.775.807'], unsigned: ['0', '18.446.744.073.709.551.615'] } };
+      document.getElementById('intCalc').onclick = () => { const t = document.getElementById('intType').value, s = document.getElementById('unsigned').value, r = ranges[t][s]; document.getElementById('intResult').textContent = `${t}${s === 'unsigned' ? ' UNSIGNED' : ''}: de ${r[0]} até ${r[1]}.` };
+      document.getElementById('decCalc').onclick = () => { const p = +document.getElementById('precision').value, s = +document.getElementById('scale').value, r = document.getElementById('decResult'); if (!Number.isInteger(p) || !Number.isInteger(s) || p < 1 || s < 0 || s > p) { r.textContent = 'Use inteiros com p ≥ 1 e 0 ≤ s ≤ p.'; return } const i = p - s; const max = (i ? '9'.repeat(Math.min(i, 30)) : '0') + (s ? ',' + '9'.repeat(Math.min(s, 30)) : ''); r.textContent = `DECIMAL(${p},${s}): ${i} dígito(s) antes e ${s} depois do separador. Máximo positivo conceitual: ${max}${i > 30 || s > 30 ? ' (exibição abreviada)' : ''}.` };
+      const search = document.getElementById('search'); search.addEventListener('input', () => { const q = search.value.trim().toLocaleLowerCase('pt-BR'); modules.forEach(m => m.classList.remove('search-hit')); if (q.length < 2) return; const hits = modules.filter(m => m.innerText.toLocaleLowerCase('pt-BR').includes(q)); hits.forEach(m => m.classList.add('search-hit')); if (hits[0]) hits[0].scrollIntoView({ behavior: 'smooth', block: 'start' }) });
+      const io = new IntersectionObserver(es => { es.filter(e => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio).slice(0, 1).forEach(e => { nav.querySelectorAll('a').forEach(a => a.classList.toggle('active', a.dataset.id === e.target.id)); mobile.value = e.target.id }) }, { rootMargin: '-20% 0px -65% 0px', threshold: [0, .25, .5] }); modules.forEach(m => io.observe(m));
+    })();
+  </script>
+</body>
+
+</html>
